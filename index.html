@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+    <style type="text/css">
+      .dark{
+        color:#555;
+      }
+    </style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <code>> sls refactor</code>
+        </section>
+
+				<section>
+          <h1>Structure†</h1>
+          <ol>
+            <li>app/
+              <ol>
+                <li>api/*†</li>
+                <li>iot/*†</li>
+                <li>common/†</li>
+              </ol>
+            </li>
+            <li>test/
+              <ol>
+                <li>api/</li>
+                <li>iot/</li>
+                <li>common/</li>
+              </ol>
+            </li>
+            <li>scripts/</li>
+          </ol>
+
+          <aside>* = sls 'service' = configured and deployed together</aside>
+          <aside>† = npm package</aside>
+        </section>
+
+        <section>
+          <h1>Common</h1>
+
+          <section>
+            <p>Currently referenced via local package in <code>package.json</code></p>
+            <pre><code>{
+  ...
+  "dependencies": {
+    ...
+    "hmi-common": ".\\..\\common"
+    ...
+  }
+}</code></pre>
+
+            <p>Considering move to <code>npm link</code><p>
+          </section>
+
+          <section>
+
+            <h3>Injection</h3>
+
+            <p><code>const injector = require( 'hmi-common/injector' );</code></p>
+            <p><code>injector.require( 'http' );</code></p>
+            <p>e.g. ...tokens.js</p>
+
+          </section>
+
+          <section>
+
+            <h3>Configuration</h3>
+
+            <p><code>require( 'dotenv' ).config();</code></p>
+            <p>Anything in '.env' is picked up via dotenv, and exposed via <code>process.env</code></p>
+            <p>Enabled via serverless-plugin-write-env-var, which pulls config from `serverless.yml`</p>
+
+          </section>
+        </section>
+
+        <section>
+          <h1>Testing</h1>
+
+          <section>
+            <p>
+              Run 'em all<br/>
+              <code><span class="dark">~\hmi-lambda-v2></span> npm test .\test</code>
+            </p>
+            <p>
+              Run a subset<br/>
+              <code><span class="dark">~\hmi-lambda-v2></span> npm test .\test\api\**\*.js</code>
+            </p>
+          </section>
+
+          <section>
+            If you have a dependency, use <code>injector</code> or take as a param.
+          </section>
+        </section>
+
+        <section>
+          <h1>Deployment</h1>
+
+          <section>
+            <h3>Specific Services</h3>
+            <p><code><span class="dark">~\hmi-lambda-v2\app\api></span>sls deploy</code></p>
+
+            <h3>Everything</h3>
+            <p><code><span class="dark">~\hmi-lambda-v2></span>npm run deploy-all-services</code></p>
+          </section>
+
+          <section>
+            <h3>Dependent Resources</h3>
+            <p>Using cloudformation in <code>serverless.yml</code> to scaffold AWS components</p>
+          </section>
+        </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
